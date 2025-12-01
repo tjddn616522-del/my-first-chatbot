@@ -34,7 +34,7 @@ if prompt := st.chat_input("무엇을 도와드릴까요?"):
     # (2) AI 응답 생성 (스트리밍 방식 아님, 단순 호출 예시)
     with st.chat_message("assistant"):
         response = client.chat.completions.create(
-            model="gpt-4o-mini", # 사용하시는 배포명(Deployment Name)으로 수정 필요!
+            model="ai058-gpt-4o-mini", # 사용하시는 배포명(Deployment Name)으로 수정 필요!
             messages=[
                 {"role": m["role"], "content": m["content"]}
                 for m in st.session_state.messages
