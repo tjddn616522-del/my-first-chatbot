@@ -16,6 +16,12 @@ client = AzureOpenAI(
     azure_endpoint=os.getenv("AZURE_OAI_ENDPOINT")
 )
 
+# ⭐️ 새로 추가된 부분 1: 사이드바 설정 ⭐️
+with st.sidebar:
+    st.header("✨ 울산 테마 선택")
+    selected_theme = st.selectbox("어떤 여행 테마를 원하세요?", ["전체", "자연/힐링", "역사/문화", "맛집/미식"])
+# ---------------------------------------------
+
 # 3. 대화기록(Session State) 초기화 - 이게 없으면 새로고침 때마다 대화가 날아갑니다!
 if "messages" not in st.session_state:
     st.session_state.messages = []
@@ -34,8 +40,12 @@ if prompt := st.chat_input("무엇을 도와드릴까요?"):
     # (2) AI 응답 생성 (스트리밍 방식 아님, 단순 호출 예시)
     with st.chat_message("assistant"):
         response = client.chat.completions.create(
-            model="ai058-gpt-4o-mini", # 사용하시는 배포명(Deployment Name)으로 수정 필요!
+            # 배포명은 이미 수정됨
+            model="ai058-gpt-4o-mini", 
             messages=[
+                # ⭐️ 수정된 부분 2: 시스템 프롬프트에 테마 변수(f-string) 추가 ⭐️
+                {"role": "system", "content": f"너는 울산 토박이처럼 친절하고 전문적인 {selected_theme} 테마의 여행 가이드야. 모든 답변은 울산의 {selected_theme} 관련 코스 추천이나 명소 정보에 중점을 둬."},
+                # ------------------------------------------------------------------------
                 {"role": m["role"], "content": m["content"]}
                 for m in st.session_state.messages
             ]
