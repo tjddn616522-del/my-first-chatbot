@@ -1,0 +1,18 @@
+[theme]
+# 앱의 기본 테마를 밝게 설정합니다.
+base="light"
+
+# 버튼, 선택 박스 등 앱의 주요 요소에 사용될 색상 (선명하고 시원한 블루)
+primaryColor="#007BFF" 
+
+# 앱 배경 색상 (아주 밝은 하늘색 계열)
+backgroundColor="#E9F4FF"
+
+# 사이드바, 메시지 창 등 보조 배경 색상 (순백색)
+secondaryBackgroundColor="#FFFFFF"
+
+# 텍스트 색상 (짙은 남색)
+textColor="#1C3F60"
+
+# 폰트 스타일은 기본값을 사용합니다.
+# font="sans serif"
