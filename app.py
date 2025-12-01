@@ -9,7 +9,6 @@ load_dotenv()
 st.title("🤖 나의 첫 AI 챗봇")
 
 # 2. Azure OpenAI 클라이언트 설정
-# (실제 값은 .env 파일이나 여기에 직접 입력하세요)
 client = AzureOpenAI(
     api_key=os.getenv("AZURE_OAI_KEY"),
     api_version="2024-05-01-preview",
@@ -22,7 +21,7 @@ with st.sidebar:
     selected_theme = st.selectbox("어떤 여행 테마를 원하세요?", ["전체", "자연/힐링", "역사/문화", "맛집/미식"])
 # ---------------------------------------------
 
-# 3. 대화기록(Session State) 초기화 - 이게 없으면 새로고침 때마다 대화가 날아갑니다!
+# 3. 대화기록(Session State) 초기화
 if "messages" not in st.session_state:
     st.session_state.messages = []
 
@@ -36,19 +35,19 @@ if prompt := st.chat_input("무엇을 도와드릴까요?"):
     # (1) 사용자 메시지 화면에 표시 & 저장
     st.chat_message("user").markdown(prompt)
     st.session_state.messages.append({"role": "user", "content": prompt})
+    
+    # ⭐️ [핵심] 37줄 이후: System Prompt를 포함한 새로운 messages 리스트 생성 ⭐️
+    # System Prompt를 먼저 추가합니다.
+    system_message = {"role": "system", "content": f"너는 울산 토박이처럼 친절하고 전문적인 {selected_theme} 테마의 여행 가이드야. 모든 답변은 울산의 {selected_theme} 관련 코스 추천이나 명소 정보에 중점을 둬."}
+    
+    # AI에게 전달할 전체 대화 기록을 만듭니다. (System Message + 기존 대화)
+    full_messages = [system_message] + st.session_state.messages
 
-    # (2) AI 응답 생성 (스트리밍 방식 아님, 단순 호출 예시)
+    # (2) AI 응답 생성
     with st.chat_message("assistant"):
         response = client.chat.completions.create(
-            # 배포명은 이미 수정됨
-            model="ai058-gpt-4o-mini", 
-            messages=[
-                # ⭐️ 수정된 부분 2: 시스템 프롬프트에 테마 변수(f-string) 추가 ⭐️
-                {"role": "system", "content": f"너는 울산 토박이처럼 친절하고 전문적인 {selected_theme} 테마의 여행 가이드야. 모든 답변은 울산의 {selected_theme} 관련 코스 추천이나 명소 정보에 중점을 둬."},
-                # ------------------------------------------------------------------------
-                {"role": m["role"], "content": m["content"]}
-                for m in st.session_state.messages
-            ]
+            model="ai058-gpt-4o-mini",
+            messages=full_messages # ⭐️ 새롭게 만든 full_messages 사용 ⭐️
         )
         assistant_reply = response.choices[0].message.content
         st.markdown(assistant_reply)
