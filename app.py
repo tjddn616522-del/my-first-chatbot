@@ -36,18 +36,20 @@ if prompt := st.chat_input("무엇을 도와드릴까요?"):
     st.chat_message("user").markdown(prompt)
     st.session_state.messages.append({"role": "user", "content": prompt})
     
-    # ⭐️ [핵심] 37줄 이후: System Prompt를 포함한 새로운 messages 리스트 생성 ⭐️
-    # System Prompt를 먼저 추가합니다.
+    # ⭐️ [핵심] System Prompt를 포함한 새로운 messages 리스트 생성 (문법 오류 해결) ⭐️
+    # System Prompt를 먼저 정의합니다.
     system_message = {"role": "system", "content": f"너는 울산 토박이처럼 친절하고 전문적인 {selected_theme} 테마의 여행 가이드야. 모든 답변은 울산의 {selected_theme} 관련 코스 추천이나 명소 정보에 중점을 둬."}
     
     # AI에게 전달할 전체 대화 기록을 만듭니다. (System Message + 기존 대화)
+    # 이 방식으로 리스트를 합쳐야 문법 오류가 나지 않습니다.
     full_messages = [system_message] + st.session_state.messages
 
     # (2) AI 응답 생성
     with st.chat_message("assistant"):
         response = client.chat.completions.create(
+            # ⭐️ 배포명은 "ai058-gpt-4o-mini"로 가정하고 진행합니다. ⭐️
             model="ai058-gpt-4o-mini",
-            messages=full_messages # ⭐️ 새롭게 만든 full_messages 사용 ⭐️
+            messages=full_messages # ⭐️ 오류 없는 full_messages 사용 ⭐️
         )
         assistant_reply = response.choices[0].message.content
         st.markdown(assistant_reply)
